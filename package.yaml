@@ -1,0 +1,68 @@
+name:                dilithium
+version:             0.1.0
+github:              "haskell-crypto/dilithium"
+license:             BSD3
+author:              "Vincent Hanquez"
+maintainer:          "vincent@snarc.org"
+copyright:           "2018 Input Output HK"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Post Quantum Dilithium Cryptographic Signature bindings
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/haskell-crypto/dilithium#readme>
+
+dependencies:
+- base >= 0 && < 5
+- basement
+- memory
+- cryptonite
+- cryptonite-openssl
+
+library:
+  when:
+    - condition: "impl(ghc < 8.0)"
+      buildable: false
+  source-dirs: src
+  c-sources:
+    - cbits/dilithium/ref/sign.c
+    - cbits/dilithium/ref/polyvec.c
+    - cbits/dilithium/ref/packing.c
+    - cbits/dilithium/ref/poly.c
+    - cbits/dilithium/ref/reduce.c
+    - cbits/dilithium/ref/ntt.c
+    - cbits/dilithium/ref/rounding.c
+    - cbits/dilithium/ref/fips202.c
+    - cbits/dilithium/ref/rng.c
+  include-dirs: cbits/dilithium/ref
+  cpp-options: -O3 -fomit-frame-pointer -march=native -fPIC -Wall
+  extra-libraries: crypto
+
+executables:
+  pq-dilithium-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dilithium
+
+tests:
+  pq-dilithium-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - dilithium
